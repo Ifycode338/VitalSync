@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/favicon.png" type="image/png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <title>VitalSync | Health Tracker</title>
+    <style>
+      body {
+        background: linear-gradient(180deg, #f4fbfa 0%, #eef6f7 100%);
+      }
+
+      .tracker-hero {
+        padding: 4rem 1rem 2rem;
+      }
+
+      .tracker-shell {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 2rem;
+        align-items: stretch;
+      }
+
+      .tracker-intro,
+      .bmi-card,
+      .tracker-panel,
+      .goal-card,
+      .mini-card {
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: 0 18px 40px rgba(17, 17, 17, 0.06);
+        border: 1px solid rgba(13, 91, 99, 0.08);
+      }
+
+      .tracker-intro {
+        padding: 2.3rem;
+        background: linear-gradient(135deg, #0d5b63, #1da5a7);
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tracker-intro::before,
+      .tracker-intro::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .tracker-intro::before {
+        right: -80px;
+        top: -80px;
+      }
+
+      .tracker-intro::after {
+        left: -65px;
+        bottom: -90px;
+      }
+
+      .tracker-intro > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .tracker-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.9rem;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+      }
+
+      .tracker-intro h1 {
+        font-size: clamp(2.3rem, 4vw, 3.3rem);
+        line-height: 1.1;
+        margin-bottom: 1rem;
+      }
+
+      .tracker-intro p {
+        max-width: 52ch;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .tracker-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.6rem;
+      }
+
+      .tracker-actions .btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.8rem 1.4rem;
+      }
+
+      .tracker-actions .btn.secondary {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #fff;
+        box-shadow: none;
+      }
+
+      .bmi-card {
+        padding: 1.5rem;
+      }
+
+      .bmi-card h3,
+      .tracker-panel h3,
+      .goal-card h3 {
+        margin-bottom: 1rem;
+        font-size: 1.15rem;
+        color: var(--text-dark);
+      }
+
+      .bmi-form {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .bmi-form .field {
+        display: grid;
+        gap: 0.4rem;
+      }
+
+      .field label {
+        color: var(--text-dark);
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+
+      .field input {
+        width: 100%;
+        padding: 0.8rem 0.9rem;
+        border: 1px solid rgba(13, 91, 99, 0.14);
+        border-radius: 10px;
+        background: #f4fbfa;
+      }
+
+      .bmi-result {
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        background: rgba(34, 199, 184, 0.1);
+        color: var(--primary-color-dark);
+        font-weight: 700;
+        line-height: 1.5;
+      }
+
+      .bmi-result.healthy {
+        background: rgba(72, 187, 120, 0.12);
+        color: #1f7d52;
+      }
+
+      .bmi-result.warning {
+        background: rgba(245, 158, 11, 0.12);
+        color: #9a5b00;
+      }
+
+      .bmi-result.alert {
+        background: rgba(239, 68, 68, 0.1);
+        color: #b42318;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .mini-card {
+        padding: 1.2rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .mini-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 30px rgba(17, 17, 17, 0.08);
+      }
+
+      .mini-card .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.8rem;
+        height: 2.8rem;
+        margin-bottom: 0.8rem;
+        border-radius: 14px;
+        background: var(--primary-color-light);
+        color: var(--primary-color);
+        font-size: 1.35rem;
+      }
+
+      .mini-card .icon i {
+        display: inline-block;
+      }
+
+      .mini-card .value {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+
+      .mini-card .label {
+        color: var(--text-light);
+        font-size: 0.85rem;
+      }
+
+      .tracker-section {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+      }
+
+      .tracker-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 2rem;
+      }
+
+      .tracker-panel,
+      .goal-card {
+        padding: 1.6rem;
+      }
+
+      .goals-list {
+        display: grid;
+        gap: 1.1rem;
+      }
+
+      .goal-item {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .goal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .goal-percent {
+        font-size: 0.82rem;
+        padding: 0.3rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(13, 91, 99, 0.08);
+        color: var(--primary-color-dark);
+      }
+
+      .goal-progress {
+        width: 100%;
+        height: 12px;
+        background: #edf4f5;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .goal-progress span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+        transition: width 0.3s ease;
+      }
+
+      .quick-log {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .quick-log button {
+        padding: 0.65rem 0.8rem;
+        border: 1px solid rgba(13, 91, 99, 0.1);
+        border-radius: 10px;
+        background: #f4fbfa;
+        color: var(--primary-color);
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s ease;
+      }
+
+      .quick-log button:hover,
+      .quick-log button.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        box-shadow: 0 12px 22px rgba(13, 91, 99, 0.18);
+      }
+
+      .goal-card .status-box {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(34, 199, 184, 0.12), rgba(13, 91, 99, 0.06));
+      }
+
+      .status-box h4 {
+        margin-bottom: 0.4rem;
+        font-size: 1rem;
+        color: var(--text-dark);
+      }
+
+      .status-box p {
+        color: var(--text-light);
+      }
+
+      @media (max-width: 960px) {
+        .tracker-shell,
+        .tracker-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .metrics-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 600px) {
+        .metrics-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .tracker-intro,
+        .bmi-card,
+        .tracker-panel,
+        .goal-card,
+        .mini-card {
+          padding: 1.2rem;
+        }
+
+        .tracker-actions {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="section-container nav-container">
+        <div class="nav-logo">
+          <img src="assets/logo.png" alt="" />
+          Vital<span>Sync</span>
+        </div>
+        <div class="nav-menu">
+          <ul class="nav-links">
+            <li class="link"><a href="index.html#home">Home</a></li>
+            <li class="link"><a href="index.html#about">About Us</a></li>
+            <li class="link"><a href="index.html#service">Services</a></li>
+            <li class="link"><a href="index.html#pages">Pages</a></li>
+            <li class="link"><a href="index.html#blog">Blog</a></li>
+            <li class="link"><a href="appointment.html">Appointment</a></li>
+            <li class="link"><a href="health-tracker.html">Health Tracker</a></li>
+          </ul>
+        </div>
+        <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <a class="btn" href="appointment.html">Book Visit</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section-container tracker-hero">
+        <div class="tracker-shell">
+          <div class="tracker-intro">
+            <div class="tracker-badge"><i class="ri-heart-pulse-fill"></i> Wellness dashboard</div>
+            <h1>Track your health, one step at a time.</h1>
+            <p>
+              Stay on top of your daily health goals with a simple dashboard built
+              to help you monitor your progress, stay consistent, and feel your best.
+            </p>
+            <div class="tracker-actions">
+              <a href="appointment.html" class="btn">Book consult</a>
+              <a href="#tracker-section" class="btn secondary">View progress</a>
+            </div>
+          </div>
+
+          <div class="bmi-card">
+            <h3>BMI Calculator</h3>
+            <form class="bmi-form" id="bmiForm">
+              <div class="field">
+                <label for="height">Height (cm)</label>
+                <input id="height" type="number" min="1" placeholder="170" />
+              </div>
+              <div class="field">
+                <label for="weight">Weight (kg)</label>
+                <input id="weight" type="number" min="1" placeholder="65" />
+              </div>
+              <button class="btn" type="submit">Calculate BMI</button>
+            </form>
+            <div class="bmi-result" id="bmiResult">Your BMI result will appear here.</div>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="mini-card">
+            <span class="icon"><i class="ri-water-flash-fill"></i></span>
+            <span class="value">2.1L</span>
+            <span class="label">Water intake</span>
+          </div>
+          <div class="mini-card">
+            <span class="icon"><i class="ri-moon-clear-fill"></i></span>
+            <span class="value">7.4h</span>
+            <span class="label">Sleep</span>
+          </div>
+          <div class="mini-card">
+            <span class="icon"><i class="ri-heart-pulse-fill"></i></span>
+            <span class="value">72</span>
+            <span class="label">Heart rate</span>
+          </div>
+          <div class="mini-card">
+            <span class="icon"><i class="ri-footprint-fill"></i></span>
+            <span class="value">8.4k</span>
+            <span class="label">Steps</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-container tracker-section" id="tracker-section">
+        <div class="tracker-layout">
+          <div class="tracker-panel">
+            <h3>Daily goals</h3>
+            <div class="goals-list">
+              <div class="goal-item" data-goal-key="hydration" data-progress="80">
+                <div class="goal-head">
+                  <span>Hydration</span>
+                  <strong class="goal-percent">80%</strong>
+                </div>
+                <div class="goal-progress"><span style="width: 80%"></span></div>
+              </div>
+              <div class="goal-item" data-goal-key="movement" data-progress="65">
+                <div class="goal-head">
+                  <span>Movement</span>
+                  <strong class="goal-percent">65%</strong>
+                </div>
+                <div class="goal-progress"><span style="width: 65%"></span></div>
+              </div>
+              <div class="goal-item" data-goal-key="sleep" data-progress="90">
+                <div class="goal-head">
+                  <span>Sleep routine</span>
+                  <strong class="goal-percent">90%</strong>
+                </div>
+                <div class="goal-progress"><span style="width: 90%"></span></div>
+              </div>
+              <div class="goal-item" data-goal-key="meals" data-progress="75">
+                <div class="goal-head">
+                  <span>Meal balance</span>
+                  <strong class="goal-percent">75%</strong>
+                </div>
+                <div class="goal-progress"><span style="width: 75%"></span></div>
+              </div>
+            </div>
+
+            <div class="quick-log">
+              <button type="button" data-goal="hydration" data-label="+ 250ml water">+ 250ml water</button>
+              <button type="button" data-goal="movement" data-label="+ 1 walk">+ 1 walk</button>
+              <button type="button" data-goal="sleep" data-label="+ sleep log">+ sleep log</button>
+            </div>
+          </div>
+
+          <div class="goal-card">
+            <h3>Health score</h3>
+            <div class="status-box">
+              <h4>Your score today</h4>
+              <p>87/100 — strong progress. You are meeting most of your wellness goals.</p>
+            </div>
+            <div class="status-box">
+              <h4>Recommendation</h4>
+              <p>Try a 10-minute walk after lunch and keep your hydration above 2.5L today.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="section-container footer-container">
+        <div class="footer-col">
+          <h3>Vital<span>Sync</span></h3>
+          <p>
+            We are honored to be a part of your healthcare journey and committed
+            to delivering compassionate, personalized, and top-notch care every
+            step of the way.
+          </p>
+          <p>
+            Trust us with your health, and let us work together to achieve the
+            best possible outcomes for you and your loved ones.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>About Us</h4>
+          <p>Home</p>
+          <p>About Us</p>
+          <p>Work With Us</p>
+          <p>Our Blog</p>
+          <p>Terms & Conditions</p>
+        </div>
+        <div class="footer-col">
+          <h4>Services</h4>
+          <p>Search Terms</p>
+          <p>Advance Search</p>
+          <p>Privacy Policy</p>
+          <p>Suppliers</p>
+          <p>Our Stores</p>
+        </div>
+        <div class="footer-col">
+          <h4>Contact Us</h4>
+          <p><i class="ri-map-pin-2-fill"></i> 22, Uju Upaka, Lekki, Lagos, Nigeria</p>
+          <p><i class="ri-mail-fill"></i> activatexacademy@care.com</p>
+          <p><i class="ri-phone-fill"></i> (+234) 3456 789</p>
+        </div>
+      </div>
+      <div class="footer-bar">
+        <div class="footer-bar-content">
+          <p>Copyright © 2026 BuildX VitalSync Limited. All rights reserved.</p>
+          <div class="footer-socials">
+            <span><i class="ri-instagram-line"></i></span>
+            <span><i class="ri-facebook-fill"></i></span>
+            <span><i class="ri-heart-fill"></i></span>
+            <span><i class="ri-twitter-fill"></i></span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const toggleButton = document.querySelector('.nav-toggle');
+      const navMenu = document.querySelector('.nav-menu');
+      const navLinks = document.querySelectorAll('.nav-links a');
+      const bmiForm = document.getElementById('bmiForm');
+      const bmiResult = document.getElementById('bmiResult');
+
+      function updateBmiState(type, message) {
+        bmiResult.className = 'bmi-result';
+        bmiResult.classList.add(type);
+        bmiResult.textContent = message;
+      }
+
+      bmiForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const heightCm = Number(document.getElementById('height').value);
+        const weightKg = Number(document.getElementById('weight').value);
+
+        if (!heightCm || !weightKg || heightCm <= 0 || weightKg <= 0) {
+          updateBmiState('alert', 'Please enter valid height and weight values greater than zero.');
+          return;
+        }
+
+        const heightM = heightCm / 100;
+        const bmi = weightKg / (heightM * heightM);
+
+        let category = 'Healthy range';
+        let stateClass = 'healthy';
+        let note = 'You are in a healthy range. Keep your routine consistent.';
+
+        if (bmi < 18.5) {
+          category = 'Underweight';
+          stateClass = 'warning';
+          note = 'You may benefit from better energy intake and a nutrition review.';
+        } else if (bmi < 25) {
+          category = 'Healthy range';
+          stateClass = 'healthy';
+          note = 'You are in a healthy range. Keep your routine consistent.';
+        } else if (bmi < 30) {
+          category = 'Overweight';
+          stateClass = 'warning';
+          note = 'A small increase in movement and balanced meals can help improve your health.';
+        } else {
+          category = 'Obesity';
+          stateClass = 'alert';
+          note = 'A clinician can help you build a manageable plan for long-term wellness.';
+        }
+
+        const idealMinKg = 18.5 * (heightM * heightM);
+        const idealMaxKg = 24.9 * (heightM * heightM);
+
+        updateBmiState(
+          stateClass,
+          `Your BMI is ${bmi.toFixed(1)} — ${category}. Ideal range: ${idealMinKg.toFixed(1)} to ${idealMaxKg.toFixed(1)} kg. ${note}`
+        );
+      });
+
+      const quickButtons = document.querySelectorAll('.quick-log button');
+      quickButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const goalKey = button.dataset.goal;
+          const goalItem = document.querySelector(`[data-goal-key="${goalKey}"]`);
+
+          if (!goalItem) return;
+
+          const progressBar = goalItem.querySelector('.goal-progress span');
+          const percentText = goalItem.querySelector('.goal-percent');
+          const current = Number(goalItem.dataset.progress || 0);
+          const next = Math.min(100, current + 10);
+
+          goalItem.dataset.progress = String(next);
+          progressBar.style.width = `${next}%`;
+          percentText.textContent = `${next}%`;
+          button.classList.toggle('active');
+          button.textContent = button.classList.contains('active') ? 'Logged ✓' : button.dataset.label;
+        });
+      });
+
+      if (toggleButton && navMenu) {
+        toggleButton.addEventListener('click', () => {
+          const isOpen = navMenu.classList.toggle('open');
+          toggleButton.classList.toggle('active', isOpen);
+          toggleButton.setAttribute('aria-expanded', isOpen);
+        });
+
+        navLinks.forEach((link) => {
+          link.addEventListener('click', () => {
+            navMenu.classList.remove('open');
+            toggleButton.classList.remove('active');
+            toggleButton.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
